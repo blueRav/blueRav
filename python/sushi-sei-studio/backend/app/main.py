@@ -30,9 +30,11 @@ class Inquiry(StrictModel):
     guests: int = Field(strict=True, ge=2, le=200)
     event_date: date
     notes: str = Field(default="", max_length=1000)
-    @field_validator("name", "notes")
+    @field_validator("name", "notes", mode="before")
     @classmethod
     def trim_text(cls, value):
+        if not isinstance(value, str):
+            return value
         value = value.strip()
         if "\x00" in value:
             raise ValueError("Invalid text")

@@ -62,6 +62,11 @@ class ApiTests(unittest.TestCase):
         payload = self.inquiry()
         payload["email"] = "invalid"
         self.assertEqual(self.client.post("/api/catering", json=payload).status_code, 422)
+    def test_blank_and_non_string_names_are_rejected(self):
+        for name in ["  ", " A ", 123, None]:
+            payload = self.inquiry()
+            payload["name"] = name
+            self.assertEqual(self.client.post("/api/catering", json=payload).status_code, 422)
     def test_recommendations_obey_preferences_and_budget(self):
         result = self.client.post("/api/recommend", json={"diet": "vegetarian", "budget_cents": 600}).json()
         self.assertTrue(all(item["price_cents"] <= 600 and item["diet"] == "vegetarian" for item in result["items"]))

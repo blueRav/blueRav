@@ -50,7 +50,7 @@ Interactive OpenAPI documentation: http://localhost:8000/docs.
 | POST | /api/catering | Save a demo inquiry; accepts Idempotency-Key |
 | GET | /api/catering | Private demo inbox; requires configured bearer token |
 
-Copy .env.example for available settings. SUSHI_ADMIN_TOKEN is empty by default, disabling the inbox. Never embed it in VITE_ variables. SUSHI_DATABASE controls SQLite location; SUSHI_ORIGINS configures allowed development origins. The public inquiry endpoint is a demonstration: production use would need authenticated staff, rate limits, retention controls, operational monitoring, and deployment-specific TLS.
+Use .env.example as a reference and export the variables in the shell that starts uvicorn; the development command does not load .env automatically. For Docker Compose, add an environment or env_file mapping to the service when configuring custom settings. SUSHI_ADMIN_TOKEN is empty by default, disabling the inbox. Never embed it in VITE_ variables. SUSHI_DATABASE controls SQLite location; SUSHI_ALLOWED_ORIGINS configures allowed development origins. The public inquiry endpoint is a demonstration: production use would need authenticated staff, rate limits, retention controls, operational monitoring, and deployment-specific TLS.
 
 ## Verification
 ```sh
