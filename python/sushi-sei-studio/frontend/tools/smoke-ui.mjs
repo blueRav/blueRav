@@ -47,7 +47,7 @@ try {
   await page.getByRole("button", { name: "Open pickup plan, 1 items", exact: true }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  const quoteResponse = page.waitForResponse(response => response.url().endsWith("/api/quote") && response.request().method() === "POST");
+  const quoteResponse = page.waitForResponse(response => response.url().endsWith("/api/quote") && response.request().method() === "POST" && JSON.parse(response.request().postData()).lines.some(line => line.quantity === 2));
   await dialog.getByRole("button", { name: "Add one California Roll", exact: true }).click();
   const checkedQuote = await (await quoteResponse).json();
   if (checkedQuote.subtotal_cents !== 1598) throw Error("The frontend did not receive the Python-priced quote");

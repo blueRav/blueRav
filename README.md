@@ -18,6 +18,22 @@ Each repository includes source, synthetic fixtures, a deterministic demo, an op
 
 The demos run without an API key. Live mode requires your own credentials and configured model. External writes are simulated; these are portfolio prototypes rather than production deployments.
 
+## Python and full-stack portfolio
+
+Five additional runnable projects live in this repository:
+
+| Project | Focus |
+| --- | --- |
+| [Forge Workflow Orchestrator](python/forge-workflow-orchestrator/) | Durable async orchestration, parallel tasks, retries, and approval gates |
+| [Atlas Agent Memory](python/atlas-agent-memory/) | Versioned SQLite memory, evidence provenance, and scoped search |
+| [Scoped MCP Toolbox](python/scoped-mcp-toolbox/) | Read-only tools, resources, and prompts over stdio MCP |
+| [Policy Support Agent](python/policy-support-agent/) | Evidence-backed tool use and reviewed synthetic resolutions |
+| [Sushi Sei Studio](python/sushi-sei-studio/) | Modern restaurant website with React, FastAPI, and SQLite |
+
+[Explore the restaurant preview](https://bluerav.github.io/blueRav/) · [Browse all Python projects](python/)
+
+The hosted restaurant preview uses browser-local demo state. The repository includes a runnable Python backend and Docker setup for the complete application. Default demos and the design skill used are free; optional live model usage is opt-in. CI checks Python 3.12/3.13, frontend builds, API integration, and browser accessibility.
+
 ## Try a project
 
 ```bash

@@ -1,7 +1,7 @@
 FROM node:22-slim AS frontend
 WORKDIR /build
 COPY frontend/package*.json frontend/
-RUN npm --prefix frontend install --no-audit --no-fund
+RUN npm --prefix frontend ci --no-audit --no-fund
 COPY frontend frontend
 COPY data data
 RUN npm --prefix frontend run build
