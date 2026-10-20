@@ -1,0 +1,25 @@
+{
+  "name": "sushi-sei-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.mjs",
+    "test:ui": "node tools/smoke-ui.mjs",
+    "prebuild": "node tools/fetch-assets.mjs",
+    "predev": "node tools/fetch-assets.mjs"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "lucide-react": "^0.468.0"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0",
+    "@playwright/test": "^1.50.0",
+    "@axe-core/playwright": "^4.10.0"
+  }
+}
