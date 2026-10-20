@@ -23,7 +23,18 @@ try {
     await page.getByRole("button",{name:"Add California Roll to pickup plan",exact:true}).click();
     await page.getByRole("button",{name:"Open pickup plan, 1 items",exact:true}).click();
     await expect(page.getByRole("dialog").locator(".pickup-summary")).toContainText("$7.99");
+    await page.getByRole("dialog").getByRole("button",{name:"Add one California Roll",exact:true}).click();
+    await expect(page.getByRole("dialog").locator(".pickup-summary")).toContainText("$15.98");
+    await page.getByRole("dialog").getByRole("button",{name:"Remove one California Roll",exact:true}).click();
+    await expect(page.getByRole("dialog").locator(".pickup-summary")).toContainText("$7.99");
     await page.keyboard.press("Escape");
+    await page.getByRole("button",{name:"Decrease California Roll quantity",exact:true}).click();
+    await expect(page.getByRole("button",{name:"Open pickup plan, 0 items",exact:true})).toBeVisible();
+    await page.reload({waitUntil:"networkidle"});
+    await expect(page.getByRole("button",{name:"Open pickup plan, 0 items",exact:true})).toBeVisible();
+    await expect(page.getByRole("heading",{level:1})).toHaveCSS("user-select","none");
+    await expect(page.getByLabel("Search the menu",{exact:true})).toHaveCSS("user-select","text");
+
     await page.getByRole("button",{name:"Try the catering planner",exact:true}).click();
     await page.getByLabel("Your name",{exact:true}).fill("Demo Guest");
     await page.getByLabel("Email address",{exact:true}).fill("demo@example.com");
@@ -38,7 +49,7 @@ try {
     if(failures.length||errors.length)throw Error(JSON.stringify({failures,errors}));
     await page.evaluate(()=>scrollTo(0,0));
     await page.screenshot({path:"dist/qa/"+name+".png",fullPage:true});
-    reports.push({viewport:name,status:"passed",seriousAccessibilityIssues:0,checks:["local pickup estimate","browser-only inquiry","hero loaded","no horizontal overflow"]});
+    reports.push({viewport:name,status:"passed",seriousAccessibilityIssues:0,checks:["local pickup estimate","decrease quantities in drawer and menu","removal persists after reload","page selection disabled and fields editable","browser-only inquiry","hero loaded","no horizontal overflow"]});
     await context.close();
   }
   await writeFile("dist/qa/report.json",JSON.stringify(reports,null,2));

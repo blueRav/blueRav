@@ -56,6 +56,13 @@ try {
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole("button", { name: "Open pickup plan, 2 items", exact: true })).toBeFocused();
   report.checks.push("pickup quantity changes, Python quote integration, Escape close, and restored keyboard focus");
+  await page.getByRole("button", { name: "Decrease California Roll quantity", exact: true }).click();
+  await page.getByRole("button", { name: "Open pickup plan, 1 items", exact: true }).click();
+  await dialog.getByRole("button", { name: "Remove one California Roll", exact: true }).click();
+  await expect(dialog.getByText("Your next favorite is waiting.", { exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  report.checks.push("menu decrease and drawer removal at zero");
+
   await page.getByRole("button", { name: "Try the catering planner", exact: true }).click();
   await page.getByLabel("Your name", { exact: true }).fill("QA Guest");
   await page.getByLabel("Email address", { exact: true }).fill("qa@example.com");
