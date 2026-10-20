@@ -1,0 +1,28 @@
+name: Python Portfolio CI
+on:
+  push:
+    paths: ["python/**", "tools/**", ".github/workflows/python-ci.yml"]
+  pull_request:
+    paths: ["python/**", "tools/**", ".github/workflows/python-ci.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install website API dependencies when present
+        run: |
+          if [ -f python/sushi-sei-studio/backend/requirements.txt ]; then
+            python -m pip install -r python/sushi-sei-studio/backend/requirements.txt
+          fi
+      - run: python -m compileall -q python
+      - run: python tools/verify_python_suite.py
