@@ -1,0 +1,128 @@
+{
+  "currency": "USD",
+  "source_url": "http://www.sushiseiexpress.com/menu-1.html",
+  "verified_on": "2026-10-20",
+  "price_note": "Prices transcribed from the restaurant's posted white-rice menu. Confirm current prices and availability by phone.",
+  "items": [
+    {
+      "id": "double-salmon",
+      "name": "Double Salmon",
+      "description": "Salmon and avocado, finished with more salmon and avocado.",
+      "category": "signature",
+      "diet": "raw",
+      "price_cents": 1299,
+      "photo": "salmon",
+      "pieces": 8
+    },
+    {
+      "id": "fire-roll",
+      "name": "Fire Roll",
+      "description": "Shrimp tempura, cucumber and spicy mayo, topped with chopped tuna.",
+      "category": "signature",
+      "diet": "raw",
+      "price_cents": 1299,
+      "photo": "rolls",
+      "pieces": 8
+    },
+    {
+      "id": "spicy-tuna-dragon",
+      "name": "Spicy Tuna Dragon",
+      "description": "Tuna, cucumber and spicy mayo with avocado and masago.",
+      "category": "signature",
+      "diet": "raw",
+      "price_cents": 1299,
+      "photo": "rolls",
+      "pieces": 8
+    },
+    {
+      "id": "vegetable-dragon",
+      "name": "Vegetable Dragon",
+      "description": "Baby spinach, carrot and cucumber, topped with avocado.",
+      "category": "signature",
+      "diet": "vegetarian",
+      "price_cents": 1029,
+      "photo": "veggie",
+      "pieces": 8
+    },
+    {
+      "id": "california",
+      "name": "California Roll",
+      "description": "The familiar rice-outside favorite from the cooked-roll menu.",
+      "category": "cooked",
+      "diet": "cooked",
+      "price_cents": 799,
+      "photo": "rolls",
+      "pieces": 8
+    },
+    {
+      "id": "shrimp-california",
+      "name": "Shrimp California",
+      "description": "A shrimp variation on the California favorite.",
+      "category": "cooked",
+      "diet": "cooked",
+      "price_cents": 979,
+      "photo": "rolls",
+      "pieces": 8
+    },
+    {
+      "id": "broiled-salmon",
+      "name": "Broiled Salmon Cucumber",
+      "description": "Broiled salmon with cucumber in a rice-outside roll.",
+      "category": "cooked",
+      "diet": "cooked",
+      "price_cents": 949,
+      "photo": "salmon",
+      "pieces": 8
+    },
+    {
+      "id": "shrimp-tempura",
+      "name": "Spicy Shrimp Tempura Cucumber",
+      "description": "Shrimp tempura, cucumber and a little heat.",
+      "category": "cooked",
+      "diet": "cooked",
+      "price_cents": 1029,
+      "photo": "rolls",
+      "pieces": 8
+    },
+    {
+      "id": "avocado-small",
+      "name": "Avocado Small Roll",
+      "description": "A simple avocado roll, wrapped nori-side out.",
+      "category": "vegetarian",
+      "diet": "vegetarian",
+      "price_cents": 499,
+      "photo": "veggie",
+      "pieces": 8
+    },
+    {
+      "id": "cucumber-small",
+      "name": "Cucumber Small Roll",
+      "description": "Crisp cucumber, sushi rice and nori.",
+      "category": "vegetarian",
+      "diet": "vegetarian",
+      "price_cents": 499,
+      "photo": "veggie",
+      "pieces": 8
+    },
+    {
+      "id": "veggie-california",
+      "name": "Veggie California",
+      "description": "A vegetarian choice from the rice-outside menu.",
+      "category": "vegetarian",
+      "diet": "vegetarian",
+      "price_cents": 729,
+      "photo": "veggie",
+      "pieces": 8
+    },
+    {
+      "id": "vegetable-roll",
+      "name": "Vegetable Roll",
+      "description": "Avocado, carrot and cucumber in a rice-outside roll.",
+      "category": "vegetarian",
+      "diet": "vegetarian",
+      "price_cents": 729,
+      "photo": "veggie",
+      "pieces": 8
+    }
+  ]
+}

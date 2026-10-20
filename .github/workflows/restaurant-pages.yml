@@ -1,0 +1,52 @@
+name: Restaurant Preview
+on:
+  push:
+    branches: [main]
+    paths: ["python/sushi-sei-studio/**", ".github/workflows/restaurant-pages.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: restaurant-pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install frontend
+        working-directory: python/sushi-sei-studio/frontend
+        run: npm ci --no-audit --no-fund
+      - name: Build browser-only preview
+        working-directory: python/sushi-sei-studio/frontend
+        env:
+          VITE_STATIC_PREVIEW: "true"
+        run: npm run build
+      - name: Install test browser
+        working-directory: python/sushi-sei-studio/frontend
+        run: npx playwright install --with-deps chromium
+      - name: Verify preview and capture desktop and mobile
+        working-directory: python/sushi-sei-studio/frontend
+        run: node tools/smoke-preview.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: python/sushi-sei-studio/frontend/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy preview
+        id: deployment
+        uses: actions/deploy-pages@v4

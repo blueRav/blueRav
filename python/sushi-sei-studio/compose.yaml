@@ -1,0 +1,9 @@
+services:
+  restaurant:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - sushi-data:/data
+volumes:
+  sushi-data:
