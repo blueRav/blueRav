@@ -18,3 +18,21 @@ await writeFile(directory + "provenance.json", JSON.stringify({
   sha256: createHash("sha256").update(bytes).digest("hex")
 }, null, 2));
 console.log("Prepared the verified illustrative food photograph.");
+
+const originals = JSON.parse(await readFile(new URL("../../data/image-sources.json", import.meta.url), "utf8"));
+const provenance = [];
+await Promise.all(originals.map(async source => {
+  const filename = source.file.split("/").pop();
+  let data;
+  try { data = await readFile(directory + filename); } catch {}
+  if (!data || data.length < 1000) {
+    const response = await fetch(source.url, { signal: AbortSignal.timeout(30000) });
+    if (!response.ok || !response.headers.get("content-type")?.startsWith("image/")) throw Error("Original restaurant photograph unavailable: " + filename);
+    data = Buffer.from(await response.arrayBuffer());
+    if (data.length < 1000 || data.length > 5000000 || data[0] !== 255 || data[1] !== 216) throw Error("Invalid restaurant photograph: " + filename);
+    await writeFile(directory + filename, data);
+  }
+  provenance.push({ file: source.file, origin: source.url, source_page: source.source_page, provider: source.provider, sha256: createHash("sha256").update(data).digest("hex") });
+}));
+await writeFile(directory + "restaurant-provenance.json", JSON.stringify(provenance.sort((a,b) => a.file.localeCompare(b.file)), null, 2));
+console.log("Prepared " + originals.length + " source-attributed restaurant photographs.");

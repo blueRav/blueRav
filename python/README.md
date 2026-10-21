@@ -8,7 +8,7 @@ Five runnable projects demonstrating orchestration, agent memory, scoped tools, 
 | [Atlas Agent Memory](atlas-agent-memory/) | SQLite FTS5, evidence provenance, revisions, scope, expiry, optimistic concurrency |
 | [Scoped MCP Toolbox](scoped-mcp-toolbox/) | Stdio JSON-RPC, tool schemas, resources, prompts, lifecycle and scope validation |
 | [Policy Support Agent](policy-support-agent/) | Bounded planning, evidence-backed tools, human review, optional live model adapter |
-| [Sushi Sei Studio](sushi-sei-studio/) | React + FastAPI + SQLite restaurant redesign, production build, browser QA |
+| [Sushi Sei Studio](sushi-sei-studio/) | Complete 109-item restaurant menu, React + FastAPI + SQLite, production build, browser QA |
 
 ## Quick start
 ```sh

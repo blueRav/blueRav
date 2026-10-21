@@ -19,6 +19,12 @@ try {
     await page.goto("http://127.0.0.1:8165",{waitUntil:"networkidle"});
     await page.evaluate(()=>document.fonts.ready);
     await expect(page.getByRole("heading",{level:1})).toContainText("A little market.");
+    await expect(page.locator(".menu-item")).toHaveCount(109);
+    if (name === "mobile") {
+      await page.getByLabel("Browse the menu", {exact:true}).selectOption("party-trays");
+      await expect(page.locator(".menu-item")).toHaveCount(6);
+      await page.getByLabel("Browse the menu", {exact:true}).selectOption("all");
+    }
     if(!(await page.locator(".hero-image img").evaluate(img=>img.complete&&img.naturalWidth>0)))throw Error("Missing hero");
     await page.getByRole("button",{name:"Add California Roll to pickup plan",exact:true}).click();
     await page.getByRole("button",{name:"Open pickup plan, 1 items",exact:true}).click();
@@ -34,6 +40,13 @@ try {
     await expect(page.getByRole("button",{name:"Open pickup plan, 0 items",exact:true})).toBeVisible();
     await expect(page.getByRole("heading",{level:1})).toHaveCSS("user-select","none");
     await expect(page.getByLabel("Search the menu",{exact:true})).toHaveCSS("user-select","text");
+    await page.getByLabel("Rice for California Roll",{exact:true}).selectOption("california-brown");
+    await page.getByRole("button",{name:"Add California Roll · Brown rice to pickup plan",exact:true}).click();
+    await page.getByRole("button",{name:"Open pickup plan, 1 items",exact:true}).click();
+    await expect(page.getByRole("dialog").locator(".pickup-summary")).toContainText("$8.49");
+    await page.getByRole("dialog").getByRole("button",{name:"Remove one California Roll · Brown rice",exact:true}).click();
+    await page.keyboard.press("Escape");
+    await page.getByLabel("Rice for California Roll",{exact:true}).selectOption("california");
 
     await page.getByRole("button",{name:"Try the catering planner",exact:true}).click();
     await page.getByLabel("Your name",{exact:true}).fill("Demo Guest");
@@ -47,9 +60,16 @@ try {
     const audit=await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa","wcag22aa"]).analyze();
     const failures=audit.violations.filter(v=>["serious","critical"].includes(v.impact));
     if(failures.length||errors.length)throw Error(JSON.stringify({failures,errors}));
-    await page.evaluate(()=>scrollTo(0,0));
+    await page.evaluate(async()=>{
+      await Promise.all([...document.images].map(img=>{img.loading="eager";return img.decode().catch(()=>{});}));
+      scrollTo(0,0);
+    });
+    const brokenImages=await page.locator("img").evaluateAll(images=>images.filter(img=>!img.complete||!img.naturalWidth).map(img=>img.src));
+    if(brokenImages.length)throw Error("Broken restaurant photographs: "+brokenImages.join(", "));
+    await expect(page.locator(".gallery-photos img")).toHaveCount(3);
+    await expect(page.locator(".tray-image")).toHaveCount(6);
     await page.screenshot({path:"dist/qa/"+name+".png",fullPage:true});
-    reports.push({viewport:name,status:"passed",seriousAccessibilityIssues:0,checks:["local pickup estimate","decrease quantities in drawer and menu","removal persists after reload","page selection disabled and fields editable","browser-only inquiry","hero loaded","no horizontal overflow"]});
+    reports.push({viewport:name,status:"passed",seriousAccessibilityIssues:0,checks:["all 109 menu groups", "brown-rice price and separate quantities", "local pickup estimate","decrease quantities in drawer and menu","removal persists after reload","page selection disabled and fields editable","browser-only inquiry","all original gallery and tray photographs loaded", "hero loaded","no horizontal overflow"]});
     await context.close();
   }
   await writeFile("dist/qa/report.json",JSON.stringify(reports,null,2));

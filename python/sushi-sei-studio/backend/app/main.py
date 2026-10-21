@@ -19,7 +19,7 @@ class Line(StrictModel):
     item_id: str = Field(min_length=1, max_length=60, pattern=r"^[a-z0-9-]+$")
     quantity: int = Field(strict=True, ge=1, le=20)
 class Quote(StrictModel):
-    lines: list[Line] = Field(min_length=1, max_length=20)
+    lines: list[Line] = Field(min_length=1, max_length=200)
 class Preferences(StrictModel):
     query: str = Field(default="", max_length=100)
     diet: Literal["all", "raw", "cooked", "vegetarian"] = "all"
@@ -75,7 +75,7 @@ def create_app(database=None, admin_token=None):
         return {**SOURCE, "status": business_status(), "demo": True}
     @app.get("/api/menu")
     def menu(q: str = Query(default="", max_length=100),
-             category: Literal["all", "signature", "cooked", "vegetarian"] = "all",
+             category: Literal["all", "signature", "cooked", "vegetarian", "raw", "combos", "nigiri-combos", "bowls", "naruto", "a-la-carte", "appetizers", "sauces", "party-trays"] = "all",
              diet: Literal["all", "raw", "cooked", "vegetarian"] = "all"):
         return {**{k: v for k, v in CATALOGUE.items() if k != "items"},
                 "items": menu_search(q, category, diet)}

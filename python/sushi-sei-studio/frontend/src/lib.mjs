@@ -1,8 +1,18 @@
 export const formatMoney = cents => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
-export function filterItems(items, { query = "", category = "all" } = {}) {
+export function filterItems(items, { query = "", category = "all", diet = "all" } = {}) {
   const terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
   return items.filter(item => (category === "all" || item.category === category)
-    && terms.every(term => (item.name + " " + item.description).toLowerCase().includes(term)));
+    && (diet === "all" || item.diet === diet)
+    && terms.every(term => (item.name + " " + (item.description || "") + " " + (item.contents || []).join(" ")).toLowerCase().includes(term)));
+}
+export function groupMenuItems(items) {
+  const groups = new Map();
+  for (const item of items) {
+    const key = item.group_id || item.id;
+    if (!groups.has(key)) groups.set(key, { ...item, id: key, name: item.display_name || item.name, variants: [] });
+    groups.get(key).variants.push(item);
+  }
+  return [...groups.values()];
 }
 export function updatePlan(plan, id, quantity) {
   if (!Number.isInteger(quantity) || quantity < 0 || quantity > 20) throw Error("Choose a quantity from 0 to 20.");
@@ -13,7 +23,7 @@ export function updatePlan(plan, id, quantity) {
 export function localQuote(items, plan) {
   const lines = Object.entries(plan).map(([id, quantity]) => {
     const item = items.find(item => item.id === id);
-    if (!item || !Number.isInteger(quantity) || quantity < 1 || quantity > 20) throw Error("Invalid pickup item.");
+    if (!item || !Number.isInteger(item.price_cents) || !Number.isInteger(quantity) || quantity < 1 || quantity > 20) throw Error("Invalid pickup item.");
     return { item_id: id, name: item.name, quantity, unit_price_cents: item.price_cents, line_total_cents: item.price_cents * quantity };
   });
   return { lines, subtotal_cents: lines.reduce((total, line) => total + line.line_total_cents, 0), currency: "USD", order_placed: false };

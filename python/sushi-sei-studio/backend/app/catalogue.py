@@ -7,7 +7,7 @@ ITEMS = {item["id"]: item for item in CATALOGUE["items"]}
 SOURCE = {
     "name": "Sushi Sei Express", "location": "Ardmore Farmers Market",
     "address": "120 Coulter Avenue, Ardmore, PA 19003", "phone": "610.649.3193",
-    "telephone": "+16106493193", "hours": {"monday_saturday": "9 am – 6 pm", "sunday": "9 am – 4 pm"},
+    "telephone": "+16106493193", "email": "it.sushi.sei@gmail.com", "hours": {"monday_saturday": "9 am – 6 pm", "sunday": "9 am – 4 pm"},
     "source_url": "http://www.sushiseiexpress.com/home.html", "verified_on": "2026-10-20"
 }
 def business_status(now=None):
@@ -32,6 +32,8 @@ def quote_lines(lines):
         item_id, quantity = line["item_id"], line["quantity"]
         if item_id not in ITEMS:
             raise ValueError("Unknown menu item: " + item_id)
+        if ITEMS[item_id]["price_cents"] is None:
+            raise ValueError("Call the restaurant to confirm this item’s price")
         quantities[item_id] = quantities.get(item_id, 0) + quantity
         if quantities[item_id] > 20:
             raise ValueError("A pickup plan supports at most 20 of one item")
@@ -45,7 +47,7 @@ def quote_lines(lines):
 def recommend(query="", diet="all", budget_cents=None):
     candidates = menu_search(query, diet=diet)
     if budget_cents is not None:
-        candidates = [item for item in candidates if item["price_cents"] <= budget_cents]
+        candidates = [item for item in candidates if item["price_cents"] is not None and item["price_cents"] <= budget_cents]
     return {"items": candidates[:3], "trace": ["read_catalogue", "filter_preferences", "rank_catalogue_order"],
             "method": "deterministic_catalogue_match",
             "notice": "Ingredient preferences do not establish allergy safety. Ask the team about allergens and preparation."}

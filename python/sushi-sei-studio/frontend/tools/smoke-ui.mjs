@@ -1,3 +1,7 @@
+import { readFile } from "node:fs/promises";
+import { groupMenuItems } from "../src/lib.mjs";
+const catalogue = JSON.parse(await readFile(new URL("../../data/menu.json", import.meta.url), "utf8"));
+const menuGroups = groupMenuItems(catalogue.items);
 import { chromium } from "@playwright/test";
 import { expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
@@ -36,12 +40,12 @@ try {
   await expect(page.getByRole("heading", { level: 1 })).toContainText("A little market.");
   await expect(page.locator(".hero-image img")).toHaveJSProperty("complete", true);
   if (!(await page.locator(".hero-image img").evaluate(img => img.naturalWidth > 0))) throw Error("Hero photograph is missing");
-  await page.getByRole("button", { name: "Cooked favorites", exact: true }).click();
-  await expect(page.locator(".menu-item")).toHaveCount(4);
+  await page.getByRole("button", { name: /^Cooked rolls/ }).click();
+  await expect(page.locator(".menu-item")).toHaveCount(menuGroups.filter(item => item.category === "cooked").length);
   await page.getByLabel("Search the menu", { exact: true }).fill("unfindablezz");
-  await expect(page.getByText("No rolls found this time.", { exact: true })).toBeVisible();
+  await expect(page.getByText("No favorites found this time.", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Show all favorites", exact: true }).click();
-  await expect(page.locator(".menu-item")).toHaveCount(12);
+  await expect(page.locator(".menu-item")).toHaveCount(menuGroups.length);
   report.checks.push("menu category filtering, search, and empty-state recovery");
   await page.getByRole("button", { name: "Add California Roll to pickup plan", exact: true }).click();
   await page.getByRole("button", { name: "Open pickup plan, 1 items", exact: true }).click();
@@ -62,6 +66,30 @@ try {
   await expect(dialog.getByText("Your next favorite is waiting.", { exact: true })).toBeVisible();
   await page.keyboard.press("Escape");
   report.checks.push("menu decrease and drawer removal at zero");
+  await page.getByLabel("Rice for California Roll", { exact: true }).selectOption("california-brown");
+  await page.getByRole("button", { name: "Add California Roll · Brown rice to pickup plan", exact: true }).click();
+  await page.getByLabel("Rice for California Roll", { exact: true }).selectOption("california");
+  await page.getByRole("button", { name: "Add California Roll to pickup plan", exact: true }).click();
+  await page.getByRole("button", { name: "Open pickup plan, 2 items", exact: true }).click();
+  await expect(dialog.locator(".pickup-summary")).toContainText("$16.48");
+  await expect(dialog.locator(".pickup-lines > li")).toHaveCount(2);
+  await dialog.getByRole("button", { name: "Remove one California Roll · Brown rice", exact: true }).click();
+  await dialog.getByRole("button", { name: "Remove one California Roll", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: /^Party trays/ }).click();
+  await expect(page.locator(".menu-item")).toHaveCount(6);
+  await page.getByText("What’s in the platter", { exact: true }).first().click();
+  await expect(page.locator(".tray-contents[open]")).toContainText("Vegetable Dragon");
+  await page.getByRole("button", { name: /^The full menu/ }).click();
+  const unpriced = catalogue.items.find(item => item.price_cents === null);
+  if (unpriced) {
+    await page.getByLabel("Search the menu", { exact: true }).fill(unpriced.display_name);
+    const entry = page.locator(".menu-item").filter({ has: page.getByRole("heading", { name: unpriced.display_name, exact: true }) });
+    await expect(entry.getByRole("link", { name: "Call about " + unpriced.display_name, exact: true })).toHaveAttribute("href", "tel:+16106493193");
+    await expect(entry.getByRole("button", { name: /^Add / })).toHaveCount(0);
+    await page.getByLabel("Search the menu", { exact: true }).fill("");
+  }
+  report.checks.push("separate white/brown quantities and prices, all six trays, expandable contents, and unpriced-item phone guidance");
 
   await page.getByRole("button", { name: "Try the catering planner", exact: true }).click();
   await page.getByLabel("Your name", { exact: true }).fill("QA Guest");
@@ -94,7 +122,14 @@ try {
     const audit = await new AxeBuilder({ page: current }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
     const serious = audit.violations.filter(issue => ["serious", "critical"].includes(issue.impact));
     report.seriousAccessibilityIssues.push(...serious.map(issue => ({ viewport: name, id: issue.id, description: issue.description })));
-    await current.evaluate(() => scrollTo(0, 0));
+    await current.evaluate(async () => {
+      await Promise.all([...document.images].map(img => { img.loading = "eager"; return img.decode().catch(() => {}); }));
+      scrollTo(0, 0);
+    });
+    const brokenImages = await current.locator("img").evaluateAll(images => images.filter(img => !img.complete || !img.naturalWidth).map(img => img.src));
+    if (brokenImages.length) throw Error("Broken restaurant photographs: " + brokenImages.join(", "));
+    await expect(current.locator(".gallery-photos img")).toHaveCount(3);
+    await expect(current.locator(".tray-image")).toHaveCount(6);
     await current.screenshot({ path: artifacts + name + ".png", fullPage: true });
     report.viewports.push(name);
     if (!target) await context.close();
